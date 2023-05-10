@@ -26,6 +26,35 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    // store data in the mongodb database
+    const coffeeCollection = client.db("coffeeDB").collection("coffee");
+
+    // show all coffee data(READ)
+    app.get("/coffee", async (req, res) => {
+      const cursor = coffeeCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // const coffee = {
+    //   name: {},
+    //   quantity: {},
+    //   supplier: {},
+    //   taste: {},
+    //   category: {},
+    //   details: {},
+    //   photo: {},
+    // };
+
+    // receive coffee data from client-side(POST)
+    app.post("/coffee", async (req, res) => {
+      const newCoffee = req.body;
+      console.log(newCoffee);
+      const result = await coffeeCollection.insertOne(newCoffee);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -33,7 +62,7 @@ async function run() {
     );
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
